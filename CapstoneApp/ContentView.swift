@@ -1,17 +1,23 @@
 import SwiftUI
-import Playgrounds
+import MapKit
 
 struct ContentView: View {
     var body: some View {
-        Text("Hello, world!")
-            .padding()
+        TabView {
+            Tab("Discover", systemImage: "paperplane") {
+                NavigationStack {
+                    ListView()
+                }
+            }
+            Tab("Map", systemImage: "map.fill") {
+                Map()
+            }
+            
+        }
+        
     }
 }
 
 #Preview {
     ContentView()
-}
-
-#Playground {
-    _ = 1 + 2
 }
