@@ -13,12 +13,12 @@ struct ContentView: View {
                             } label: {
                                 HStack {
                                     Text("Today's Events")
-                                        .frame(maxWidth: .infinity, alignment: .leading)
+//                                        .frame(maxWidth: .infinity, alignment: .leading)
                                         .font(.title2)
                                         .fontWidth(.expanded)
                                         .bold()
                                     // TODO: on iPad this arrow is right-aligned
-                                    Image(systemName: "chevron.right")
+                                    Image(systemName: "chevron.right").font(Font.title2.weight(.semibold))
                                 }
                             }
                             ScrollView(.horizontal) {
@@ -40,7 +40,7 @@ struct ContentView: View {
                             } label: {
                                 HStack {
                                     Text("Tomorrow's Events")
-                                        .frame(maxWidth: .infinity, alignment: .leading)
+//                                        .frame(maxWidth: .infinity, alignment: .leading)
                                         .font(.title2)
                                         .fontWidth(.expanded)
                                         .bold()
