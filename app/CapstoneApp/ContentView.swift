@@ -17,8 +17,7 @@ struct ContentView: View {
                                         .font(.title2)
                                         .fontWidth(.expanded)
                                         .bold()
-                                    // TODO: on iPad this arrow is right-aligned
-                                    Image(systemName: "chevron.right").font(Font.title2.weight(.semibold))
+                                    Image(systemName: "chevron.right").fontWeight(.semibold).opacity(0.7)
                                 }
                             }
                             ScrollView(.horizontal) {
@@ -44,8 +43,7 @@ struct ContentView: View {
                                         .font(.title2)
                                         .fontWidth(.expanded)
                                         .bold()
-                                    // TODO: on iPad this arrow is right-aligned
-                                    Image(systemName: "chevron.right")
+                                    Image(systemName: "chevron.right").fontWeight(.semibold).opacity(0.7)
                                 }
                             }
                             ScrollView(.horizontal) {
