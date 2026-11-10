@@ -8,3 +8,8 @@ import SwiftUI
         }
     }
 }
+
+#Preview {
+    ContentView()
+        .tint(.accent)
+}
