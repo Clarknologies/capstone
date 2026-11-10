@@ -7,74 +7,28 @@ struct ContentView: View {
             Tab("Discover", systemImage: "paperplane") {
                 NavigationStack {
                     ScrollView(.vertical) {
-                        VStack(alignment: .leading) {
-                            Button {
-                                //
-                            } label: {
-                                HStack {
-                                    Text("Today's Events")
-//                                        .frame(maxWidth: .infinity, alignment: .leading)
-                                        .font(.title2)
-                                        .fontWidth(.expanded)
-                                        .bold()
-                                    Image(systemName: "chevron.right").fontWeight(.semibold).opacity(0.7)
-                                }
-                            }
-                            ScrollView(.horizontal) {
-                                LazyHGrid(rows: [
-                                    GridItem(.flexible(minimum: 25, maximum: 150)),
-                                    GridItem(.flexible(minimum: 25, maximum: 150))
-                                ], alignment: .top) {
-                                    ForEach(0..<7, id: \.self) { item in
-                                        eventItem
-                                    }
-                                }
-                                .scrollTargetLayout()
-                            }
-                            .scrollTargetBehavior(.viewAligned)
-                        }
-                        VStack(alignment: .leading) {
-                            Button {
-                                //
-                            } label: {
-                                HStack {
-                                    Text("Tomorrow's Events")
-//                                        .frame(maxWidth: .infinity, alignment: .leading)
-                                        .font(.title2)
-                                        .fontWidth(.expanded)
-                                        .bold()
-                                    Image(systemName: "chevron.right").fontWeight(.semibold).opacity(0.7)
-                                }
-                            }
-                            ScrollView(.horizontal) {
-                                LazyHGrid(rows: [
-                                    GridItem(.flexible(minimum: 25, maximum: 150)),
-                                    GridItem(.flexible(minimum: 25, maximum: 150))
-                                ], alignment: .top) {
-                                    ForEach(0..<3, id: \.self) { item in
-                                        eventItem
-                                    }
-                                }
-                                .scrollTargetLayout()
-                            }
-                            .scrollTargetBehavior(.viewAligned)
-                        }
+                        EventSection("Today")
+                        EventSection("Tomorrow")
+                        EventSection("October 29")
+                        EventSection("October 30")
                     }
-                    .padding()
+                    .navigationTitle("Discover")
+                    .navigationBarTitleDisplayMode(.inline)
                 }
             }
             Tab("Map", systemImage: "map.fill") {
-//                Map()
+                Map()
             }
             Tab ("Me", systemImage: "person.fill") {
-            //
+                //
             }
             
         }
         
     }
-
-    var eventItem: some View {
+}
+struct EventItem: View {
+    var body: some View {
         HStack(alignment: .center) {
             Image("wit-example")
                 .resizable()
@@ -103,6 +57,56 @@ struct ContentView: View {
         .frame(width: 300)
         .frame(maxHeight: .infinity)
     }
+}
+struct EventSection: View {
+    @Namespace private var namespace
+    var title: String = "Today's Events"
+    
+    init(_ title: String) {
+        self.title = title
+    }
+    
+    var body: some View {
+        VStack(alignment: .leading) {
+            Button {
+            } label: {
+                HStack {
+                    Text(title)
+                        .font(.title2)
+                        .fontWidth(.expanded)
+                        .bold()
+                    Image(systemName: "chevron.right").fontWeight(.semibold).opacity(0.7)
+                }
+            }
+            .padding(.horizontal)
+
+            ScrollView(.horizontal, showsIndicators: false) {
+                LazyHGrid(rows: [
+                    GridItem(.flexible(minimum: 25, maximum: 150)),
+                    GridItem(.flexible(minimum: 25, maximum: 150))
+                ], alignment: .top, spacing: 20) {
+                    ForEach(0..<5, id: \.self) { item in
+                        NavigationLink {
+                            EventDetailView()
+                                .navigationTransition(
+                                    .zoom(sourceID: "\(item)", in: namespace)
+                                )
+                        } label: {
+                            EventItem()
+                                .tint(Color.primary)
+                                .matchedTransitionSource(id: "\(item)", in: namespace)
+                        }
+                    }
+                }
+                .scrollTargetLayout()
+            }
+            .scrollTargetBehavior(.viewAligned)
+            .safeAreaPadding(.leading)
+        }
+        Divider()
+            .padding(.bottom)
+    }
+    
 }
 
 #Preview {
