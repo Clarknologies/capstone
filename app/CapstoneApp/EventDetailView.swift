@@ -16,11 +16,14 @@ struct EventDetailView: View {
     
     var body: some View {
         ZStack {
+            color
+                .ignoresSafeArea(.all)
+            
             
             Image("wit-example")
                 .resizable()
                 .ignoresSafeArea(.all)
-                .colorMultiply(color)
+                .blendMode(.multiply)
             
             ScrollView(.vertical) {
                 Image("wit-example")
@@ -47,6 +50,7 @@ struct EventDetailView: View {
                     .labelStyle(.iconOnly)
                 }
                 .frame(maxWidth: .infinity, alignment: .leading)
+                
                 GlassEffectContainer {
                     HStack {
                         Button {
@@ -82,7 +86,6 @@ struct EventDetailView: View {
             ToolbarItem(placement: .primaryAction) {
                 Button("Save to my events", systemImage: "bookmark") {}
             }
-            
         }
     }
 }
@@ -103,12 +106,10 @@ struct EventDetailView: View {
     .tint(Color.black)
 }
 
-#Preview("Primary expanded bold") {
+#Preview("Primary expanded") {
     NavigationStack {
         EventDetailView(color: Color.primary)
             .fontWidth(.expanded)
-            .fontWeight(.bold)
-        
     }
     .tint(.accent)
 }
