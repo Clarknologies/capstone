@@ -40,11 +40,13 @@ struct EventDetailView: View {
                             .font(.headline)
                     }
                     Spacer()
-                    GlassEffectContainer {
-                        HStack {
-                            Button("Add to calendar", systemImage: "calendar.badge.plus") {}
-                            Button("Share", systemImage: "square.and.arrow.up") {}
-                        }
+                    Menu("More", systemImage: "ellipsis") {
+                        Button("Add to calendar", systemImage: "calendar.badge.plus") {}
+                        Divider()
+                        Button("Show QR code?", systemImage: "qrcode") {} // if we can do this
+                        Button("Share event poster", systemImage: "doc.text.image") {} // if we can do this
+
+                        Button("Report event", systemImage: "flag", role: .destructive) {}
                     }
                     .buttonStyle(.glassProminent)
                     .labelStyle(.iconOnly)
@@ -85,6 +87,9 @@ struct EventDetailView: View {
         .toolbar {
             ToolbarItem(placement: .primaryAction) {
                 Button("Save to my events", systemImage: "bookmark") {}
+            }
+            ToolbarItem(placement: .automatic) {
+                Button("Save to my events", systemImage: "square.and.arrow.up") {}
             }
         }
     }

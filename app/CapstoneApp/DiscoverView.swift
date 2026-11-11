@@ -15,6 +15,7 @@ struct DiscoverView: View {
             EventSection("October 29")
             EventSection("October 30")
         }
+        .safeAreaPadding(.leading)
         .navigationTitle("Discover")
         .navigationBarTitleDisplayMode(.inline)
     }
@@ -70,12 +71,13 @@ struct EventSection: View {
                         .font(.title2)
                         .fontWidth(.expanded)
                         .bold()
+                        .lineLimit(1, reservesSpace: true)
+                        .truncationMode(.tail)
                     Image(systemName: "chevron.right")
                         .fontWeight(.semibold)
                         .opacity(0.7)
                 }
             }
-            .padding(.horizontal)
             
             ScrollView(.horizontal, showsIndicators: false) {
                 LazyHGrid(rows: [
@@ -98,7 +100,6 @@ struct EventSection: View {
                 .scrollTargetLayout()
             }
             .scrollTargetBehavior(.viewAligned)
-            .safeAreaPadding(.leading)
         }
         Divider()
             .padding(.bottom)
