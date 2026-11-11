@@ -18,7 +18,7 @@ struct ContentView: View {
                 }
             }
             Tab("Map", systemImage: "map.fill") {
-//                Map()
+                Map()
             }
             Tab ("Me", systemImage: "person.fill") {
                 NavigationStack {
