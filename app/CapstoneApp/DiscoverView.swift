@@ -30,9 +30,13 @@ struct EventItem: View {
                 .clipShape(RoundedRectangle(cornerRadius: 8))
                 .frame(width: 75, height: 75)
             VStack(alignment: .leading) {
-                Label("Mini Golf Club", systemImage: "figure.golf")
-                    .font(.subheadline.smallCaps())
-                    .lineLimit(1)
+                HStack {
+                    Label("Mini Golf Club", systemImage: "figure.golf")
+                        .font(.subheadline.smallCaps())
+                        .lineLimit(1)
+                    Image(systemName: "checkmark.circle.badge.questionmark")
+                        .imageScale(.small)
+                }
                 Text("November Networking Coffee for Women & Gender-diverse Folks at Hula (CAREERtalk)")
                     .lineLimit(3, reservesSpace: true)
                     .multilineTextAlignment(.leading)
