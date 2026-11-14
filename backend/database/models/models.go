@@ -116,7 +116,7 @@ type Event struct {
 	PostedByUser              pgtype.UUID        `json:"posted_by_user"`
 	Category                  pgtype.Int4        `json:"category"`
 	HostedByClub              pgtype.UUID        `json:"hosted_by_club"`
-	Metadata                  []byte             `json:"metadata"`
+	Metadata                  map[string]any     `json:"metadata"`
 	CreatedAt                 pgtype.Timestamptz `json:"created_at"`
 	UpdatedAt                 pgtype.Timestamptz `json:"updated_at"`
 }
