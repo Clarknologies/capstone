@@ -49,6 +49,7 @@ CREATE TABLE IF NOT EXISTS events
     posted_by_user               UUID         REFERENCES users (user_id) ON DELETE SET NULL,
     category                     INT          REFERENCES event_categories (id) ON DELETE SET NULL,
     hosted_by_club               uuid REFERENCES clubs (club_id) ON DELETE CASCADE,
+    is_public                    BOOLEAN      NOT NULL DEFAULT FALSE,
     metadata                     jsonb        NOT NULL DEFAULT '{}',
     created_at                   timestamptz           DEFAULT NOW() NOT NULL,
     updated_at                   timestamptz           DEFAULT NOW() NOT NULL
