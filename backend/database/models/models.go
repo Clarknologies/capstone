@@ -5,58 +5,158 @@
 package database
 
 import (
+	"database/sql/driver"
+	"fmt"
+
 	"github.com/jackc/pgx/v5/pgtype"
 )
 
+type EventStatus string
+
+const (
+	EventStatusPLANNED     EventStatus = "PLANNED"
+	EventStatusRESCHEDULED EventStatus = "RESCHEDULED"
+	EventStatusCANCELED    EventStatus = "CANCELED"
+)
+
+func (e *EventStatus) Scan(src interface{}) error {
+	switch s := src.(type) {
+	case []byte:
+		*e = EventStatus(s)
+	case string:
+		*e = EventStatus(s)
+	default:
+		return fmt.Errorf("unsupported scan type for EventStatus: %T", src)
+	}
+	return nil
+}
+
+type NullEventStatus struct {
+	EventStatus EventStatus `json:"event_status"`
+	Valid       bool        `json:"valid"` // Valid is true if EventStatus is not NULL
+}
+
+// Scan implements the Scanner interface.
+func (ns *NullEventStatus) Scan(value interface{}) error {
+	if value == nil {
+		ns.EventStatus, ns.Valid = "", false
+		return nil
+	}
+	ns.Valid = true
+	return ns.EventStatus.Scan(value)
+}
+
+// Value implements the driver Valuer interface.
+func (ns NullEventStatus) Value() (driver.Value, error) {
+	if !ns.Valid {
+		return nil, nil
+	}
+	return string(ns.EventStatus), nil
+}
+
+type RsvpStatus string
+
+const (
+	RsvpStatusACCEPTED RsvpStatus = "ACCEPTED"
+	RsvpStatusDECLINED RsvpStatus = "DECLINED"
+)
+
+func (e *RsvpStatus) Scan(src interface{}) error {
+	switch s := src.(type) {
+	case []byte:
+		*e = RsvpStatus(s)
+	case string:
+		*e = RsvpStatus(s)
+	default:
+		return fmt.Errorf("unsupported scan type for RsvpStatus: %T", src)
+	}
+	return nil
+}
+
+type NullRsvpStatus struct {
+	RsvpStatus RsvpStatus `json:"rsvp_status"`
+	Valid      bool       `json:"valid"` // Valid is true if RsvpStatus is not NULL
+}
+
+// Scan implements the Scanner interface.
+func (ns *NullRsvpStatus) Scan(value interface{}) error {
+	if value == nil {
+		ns.RsvpStatus, ns.Valid = "", false
+		return nil
+	}
+	ns.Valid = true
+	return ns.RsvpStatus.Scan(value)
+}
+
+// Value implements the driver Valuer interface.
+func (ns NullRsvpStatus) Value() (driver.Value, error) {
+	if !ns.Valid {
+		return nil, nil
+	}
+	return string(ns.RsvpStatus), nil
+}
+
 type Club struct {
-	ClubID      pgtype.UUID
-	DisplayName string
+	ClubID      pgtype.UUID `json:"club_id"`
+	DisplayName string      `json:"display_name"`
+	Description pgtype.Text `json:"description"`
 }
 
 type Event struct {
-	EventID             pgtype.UUID
-	PostedBy            pgtype.UUID
-	EventName           string
-	Status              string
-	LocationDisplayName string
-	Longitude           pgtype.Numeric
-	Latitude            pgtype.Numeric
-	EventTimeStart      pgtype.Date
-	EventTimeEnd        pgtype.Date
-	CreatedAt           pgtype.Timestamptz
-	Category            pgtype.Int4
-	ClubID              pgtype.UUID
+	EventID                   pgtype.UUID        `json:"event_id"`
+	EventName                 string             `json:"event_name"`
+	Status                    EventStatus        `json:"status"`
+	Description               pgtype.Text        `json:"description"`
+	LocationDisplayName       string             `json:"location_display_name"`
+	Longitude                 pgtype.Numeric     `json:"longitude"`
+	Latitude                  pgtype.Numeric     `json:"latitude"`
+	EventTimeStart            pgtype.Timestamptz `json:"event_time_start"`
+	RescheduledEventTimeStart pgtype.Timestamptz `json:"rescheduled_event_time_start"`
+	EventTimeEnd              pgtype.Timestamptz `json:"event_time_end"`
+	PostedByUser              pgtype.UUID        `json:"posted_by_user"`
+	Category                  pgtype.Int4        `json:"category"`
+	HostedByClub              pgtype.UUID        `json:"hosted_by_club"`
+	Metadata                  []byte             `json:"metadata"`
+	CreatedAt                 pgtype.Timestamptz `json:"created_at"`
+	UpdatedAt                 pgtype.Timestamptz `json:"updated_at"`
 }
 
 type EventCategory struct {
-	ID          int32
-	DisplayName string
-}
-
-type EventStatusType struct {
-	EventStatusID string
+	ID          int32  `json:"id"`
+	DisplayName string `json:"display_name"`
 }
 
 type EventTag struct {
-	ID      int32
-	TagName string
+	ID      int32  `json:"id"`
+	TagName string `json:"tag_name"`
 }
 
 type User struct {
-	UserID    pgtype.UUID
-	FirstName string
-	LastName  string
-	Email     string
+	UserID    pgtype.UUID        `json:"user_id"`
+	FirstName string             `json:"first_name"`
+	LastName  string             `json:"last_name"`
+	Email     string             `json:"email"`
+	CreatedAt pgtype.Timestamptz `json:"created_at"`
+}
+
+type UserCategoryFollow struct {
+	UserID     pgtype.UUID `json:"user_id"`
+	CategoryID int32       `json:"category_id"`
+}
+
+type UserClubFollow struct {
+	UserID pgtype.UUID `json:"user_id"`
+	ClubID pgtype.UUID `json:"club_id"`
 }
 
 type UserRsvp struct {
-	UserID  pgtype.UUID
-	EventID pgtype.UUID
-	Status  int32
+	UserID  pgtype.UUID `json:"user_id"`
+	EventID pgtype.UUID `json:"event_id"`
+	Status  RsvpStatus  `json:"status"`
 }
 
 type UserSavedEvent struct {
-	UserID    pgtype.UUID
-	EventID   pgtype.UUID
-	CreatedAt pgtype.Timestamp
+	UserID    pgtype.UUID      `json:"user_id"`
+	EventID   pgtype.UUID      `json:"event_id"`
+	CreatedAt pgtype.Timestamp `json:"created_at"`
 }

@@ -1,2 +1,9 @@
+-- name: GetAllEvents :many
+SELECT *
+FROM events
+ORDER BY created_at;
+
 -- name: GetEventById :one
-select * from events where event_id = $1;
+SELECT *
+FROM events
+WHERE event_id = $1;

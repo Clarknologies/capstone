@@ -11,26 +11,85 @@ import (
 	"github.com/jackc/pgx/v5/pgtype"
 )
 
-const getEventById = `-- name: GetEventById :one
-select event_id, posted_by, event_name, status, location_display_name, longitude, latitude, event_time_start, event_time_end, created_at, category, club_id from events where event_id = $1
+const getAllEvents = `-- name: GetAllEvents :many
+SELECT event_id, event_name, status, description, location_display_name, longitude, latitude, event_time_start, rescheduled_event_time_start, event_time_end, posted_by_user, category, hosted_by_club, metadata, created_at, updated_at
+FROM events
+ORDER BY created_at
 `
 
+// GetAllEvents
+//
+//	SELECT event_id, event_name, status, description, location_display_name, longitude, latitude, event_time_start, rescheduled_event_time_start, event_time_end, posted_by_user, category, hosted_by_club, metadata, created_at, updated_at
+//	FROM events
+//	ORDER BY created_at
+func (q *Queries) GetAllEvents(ctx context.Context) ([]Event, error) {
+	rows, err := q.db.Query(ctx, getAllEvents)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []Event
+	for rows.Next() {
+		var i Event
+		if err := rows.Scan(
+			&i.EventID,
+			&i.EventName,
+			&i.Status,
+			&i.Description,
+			&i.LocationDisplayName,
+			&i.Longitude,
+			&i.Latitude,
+			&i.EventTimeStart,
+			&i.RescheduledEventTimeStart,
+			&i.EventTimeEnd,
+			&i.PostedByUser,
+			&i.Category,
+			&i.HostedByClub,
+			&i.Metadata,
+			&i.CreatedAt,
+			&i.UpdatedAt,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
+const getEventById = `-- name: GetEventById :one
+SELECT event_id, event_name, status, description, location_display_name, longitude, latitude, event_time_start, rescheduled_event_time_start, event_time_end, posted_by_user, category, hosted_by_club, metadata, created_at, updated_at
+FROM events
+WHERE event_id = $1
+`
+
+// GetEventById
+//
+//	SELECT event_id, event_name, status, description, location_display_name, longitude, latitude, event_time_start, rescheduled_event_time_start, event_time_end, posted_by_user, category, hosted_by_club, metadata, created_at, updated_at
+//	FROM events
+//	WHERE event_id = $1
 func (q *Queries) GetEventById(ctx context.Context, eventID pgtype.UUID) (Event, error) {
 	row := q.db.QueryRow(ctx, getEventById, eventID)
 	var i Event
 	err := row.Scan(
 		&i.EventID,
-		&i.PostedBy,
 		&i.EventName,
 		&i.Status,
+		&i.Description,
 		&i.LocationDisplayName,
 		&i.Longitude,
 		&i.Latitude,
 		&i.EventTimeStart,
+		&i.RescheduledEventTimeStart,
 		&i.EventTimeEnd,
-		&i.CreatedAt,
+		&i.PostedByUser,
 		&i.Category,
-		&i.ClubID,
+		&i.HostedByClub,
+		&i.Metadata,
+		&i.CreatedAt,
+		&i.UpdatedAt,
 	)
 	return i, err
 }
