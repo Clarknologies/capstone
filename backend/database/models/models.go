@@ -11,6 +11,49 @@ import (
 	"github.com/jackc/pgx/v5/pgtype"
 )
 
+type EventSource string
+
+const (
+	EventSourceTHEVIEW       EventSource = "THE_VIEW"
+	EventSourceCLUBSUBMITTED EventSource = "CLUB_SUBMITTED"
+	EventSourceUSERSUBMITTED EventSource = "USER_SUBMITTED"
+)
+
+func (e *EventSource) Scan(src interface{}) error {
+	switch s := src.(type) {
+	case []byte:
+		*e = EventSource(s)
+	case string:
+		*e = EventSource(s)
+	default:
+		return fmt.Errorf("unsupported scan type for EventSource: %T", src)
+	}
+	return nil
+}
+
+type NullEventSource struct {
+	EventSource EventSource `json:"event_source"`
+	Valid       bool        `json:"valid"` // Valid is true if EventSource is not NULL
+}
+
+// Scan implements the Scanner interface.
+func (ns *NullEventSource) Scan(value interface{}) error {
+	if value == nil {
+		ns.EventSource, ns.Valid = "", false
+		return nil
+	}
+	ns.Valid = true
+	return ns.EventSource.Scan(value)
+}
+
+// Value implements the driver Valuer interface.
+func (ns NullEventSource) Value() (driver.Value, error) {
+	if !ns.Valid {
+		return nil, nil
+	}
+	return string(ns.EventSource), nil
+}
+
 type EventStatus string
 
 const (
@@ -116,8 +159,10 @@ type Event struct {
 	PostedByUser              pgtype.UUID        `json:"posted_by_user"`
 	Category                  pgtype.Int4        `json:"category"`
 	HostedByClub              pgtype.UUID        `json:"hosted_by_club"`
+	HostedByUser              pgtype.UUID        `json:"hosted_by_user"`
 	IsPublic                  bool               `json:"is_public"`
 	Metadata                  map[string]any     `json:"metadata"`
+	Source                    EventSource        `json:"source"`
 	CreatedAt                 pgtype.Timestamptz `json:"created_at"`
 	UpdatedAt                 pgtype.Timestamptz `json:"updated_at"`
 }
