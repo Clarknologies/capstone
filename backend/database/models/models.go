@@ -14,9 +14,9 @@ import (
 type EventSource string
 
 const (
-	EventSourceTHEVIEW       EventSource = "THE_VIEW"
-	EventSourceCLUBSUBMITTED EventSource = "CLUB_SUBMITTED"
-	EventSourceUSERSUBMITTED EventSource = "USER_SUBMITTED"
+	EventSourceTHEVIEW        EventSource = "THE_VIEW"
+	EventSourceCLUBSUBMISSION EventSource = "CLUB_SUBMISSION"
+	EventSourceUSERSUBMISSION EventSource = "USER_SUBMISSION"
 )
 
 func (e *EventSource) Scan(src interface{}) error {
@@ -156,8 +156,8 @@ type Event struct {
 	EventTimeStart            pgtype.Timestamptz `json:"event_time_start"`
 	RescheduledEventTimeStart pgtype.Timestamptz `json:"rescheduled_event_time_start"`
 	EventTimeEnd              pgtype.Timestamptz `json:"event_time_end"`
-	PostedByUser              pgtype.UUID        `json:"posted_by_user"`
 	Category                  pgtype.Int4        `json:"category"`
+	SubmittedBy               pgtype.UUID        `json:"submitted_by"`
 	HostedByClub              pgtype.UUID        `json:"hosted_by_club"`
 	HostedByUser              pgtype.UUID        `json:"hosted_by_user"`
 	IsPublic                  bool               `json:"is_public"`

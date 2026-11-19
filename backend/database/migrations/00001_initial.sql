@@ -20,7 +20,7 @@ CREATE TABLE clubs
 
 CREATE TYPE event_status AS ENUM ('PLANNED','RESCHEDULED','CANCELED');
 CREATE TYPE rsvp_status AS ENUM ('ACCEPTED','DECLINED');
-CREATE TYPE event_source AS ENUM ('THE_VIEW','CLUB_SUBMITTED','USER_SUBMITTED');
+CREATE TYPE event_source AS ENUM ('THE_VIEW','CLUB_SUBMISSION','USER_SUBMISSION');
 
 CREATE TABLE event_categories
 (
@@ -46,19 +46,20 @@ CREATE TABLE events
     event_time_start             timestamptz  NOT NULL DEFAULT NOW(),
     rescheduled_event_time_start timestamptz           DEFAULT NULL,
     event_time_end               timestamptz  NOT NULL DEFAULT NOW() + '2 hours',
-    posted_by_user               UUID         REFERENCES users (user_id) ON DELETE SET NULL,
     category                     INT          REFERENCES event_categories (id) ON DELETE SET NULL,
+    submitted_by                 UUID         REFERENCES users (user_id) ON DELETE SET NULL,
     hosted_by_club               uuid         REFERENCES clubs (club_id) ON DELETE SET NULL,
     hosted_by_user               uuid         REFERENCES users (user_id) ON DELETE SET NULL,
     is_public                    BOOLEAN      NOT NULL DEFAULT FALSE,
-    metadata                     jsonb        NOT NULL DEFAULT '{}',
+    metadata                     jsonb        NOT NULL DEFAULT '{}', -- things for the event detail view, like font, background color
     source                       event_source NOT NULL,
     created_at                   timestamptz           DEFAULT NOW() NOT NULL,
     updated_at                   timestamptz           DEFAULT NOW() NOT NULL,
 
-    CONSTRAINT chk_hosted_by CHECK (hosted_by_user IS NOT NULL OR hosted_by_club IS NOT NULL),
+    CONSTRAINT chk_hosted_by CHECK ((hosted_by_user IS NULL AND hosted_by_club IS NOT NULL) OR
+                                    (hosted_by_user IS NOT NULL AND hosted_by_club IS NULL)),
     CONSTRAINT chk_valid_start_end_time CHECK (event_time_end > event_time_start),
-    CONSTRAINT chk_view_posting_no_user CHECK (source <> 'THE_VIEW' OR posted_by_user IS NULL)
+    CONSTRAINT chk_view_posting_no_user CHECK (source <> 'THE_VIEW' OR submitted_by IS NULL)
 );
 
 CREATE TABLE user_rsvp
@@ -92,13 +93,6 @@ CREATE TABLE user_category_follows
     category_id INT REFERENCES event_categories (id) ON DELETE CASCADE,
     PRIMARY KEY (user_id, category_id)
 );
-
-INSERT INTO users (user_id, first_name, last_name, email, created_at)
-VALUES ('597fe456-0c5d-48d4-8a31-f1490aa984e0',
-        'johnny',
-        'law',
-        'jl',
-        NOW());
 
 -- +goose down
 DROP TABLE clubs, event_categories, event_tags, events, user_category_follows, user_club_follows, user_rsvp, user_saved_events, users CASCADE;

@@ -12,14 +12,14 @@ import (
 )
 
 const getAllEvents = `-- name: GetAllEvents :many
-SELECT event_id, event_name, status, description, location_display_name, longitude, latitude, event_time_start, rescheduled_event_time_start, event_time_end, posted_by_user, category, hosted_by_club, hosted_by_user, is_public, metadata, source, created_at, updated_at
+SELECT event_id, event_name, status, description, location_display_name, longitude, latitude, event_time_start, rescheduled_event_time_start, event_time_end, category, submitted_by, hosted_by_club, hosted_by_user, is_public, metadata, source, created_at, updated_at
 FROM events
 ORDER BY created_at
 `
 
 // GetAllEvents
 //
-//	SELECT event_id, event_name, status, description, location_display_name, longitude, latitude, event_time_start, rescheduled_event_time_start, event_time_end, posted_by_user, category, hosted_by_club, hosted_by_user, is_public, metadata, source, created_at, updated_at
+//	SELECT event_id, event_name, status, description, location_display_name, longitude, latitude, event_time_start, rescheduled_event_time_start, event_time_end, category, submitted_by, hosted_by_club, hosted_by_user, is_public, metadata, source, created_at, updated_at
 //	FROM events
 //	ORDER BY created_at
 func (q *Queries) GetAllEvents(ctx context.Context) ([]Event, error) {
@@ -42,8 +42,8 @@ func (q *Queries) GetAllEvents(ctx context.Context) ([]Event, error) {
 			&i.EventTimeStart,
 			&i.RescheduledEventTimeStart,
 			&i.EventTimeEnd,
-			&i.PostedByUser,
 			&i.Category,
+			&i.SubmittedBy,
 			&i.HostedByClub,
 			&i.HostedByUser,
 			&i.IsPublic,
@@ -63,14 +63,14 @@ func (q *Queries) GetAllEvents(ctx context.Context) ([]Event, error) {
 }
 
 const getEventById = `-- name: GetEventById :one
-SELECT event_id, event_name, status, description, location_display_name, longitude, latitude, event_time_start, rescheduled_event_time_start, event_time_end, posted_by_user, category, hosted_by_club, hosted_by_user, is_public, metadata, source, created_at, updated_at
+SELECT event_id, event_name, status, description, location_display_name, longitude, latitude, event_time_start, rescheduled_event_time_start, event_time_end, category, submitted_by, hosted_by_club, hosted_by_user, is_public, metadata, source, created_at, updated_at
 FROM events
 WHERE event_id = $1
 `
 
 // GetEventById
 //
-//	SELECT event_id, event_name, status, description, location_display_name, longitude, latitude, event_time_start, rescheduled_event_time_start, event_time_end, posted_by_user, category, hosted_by_club, hosted_by_user, is_public, metadata, source, created_at, updated_at
+//	SELECT event_id, event_name, status, description, location_display_name, longitude, latitude, event_time_start, rescheduled_event_time_start, event_time_end, category, submitted_by, hosted_by_club, hosted_by_user, is_public, metadata, source, created_at, updated_at
 //	FROM events
 //	WHERE event_id = $1
 func (q *Queries) GetEventById(ctx context.Context, eventID pgtype.UUID) (Event, error) {
@@ -87,8 +87,8 @@ func (q *Queries) GetEventById(ctx context.Context, eventID pgtype.UUID) (Event,
 		&i.EventTimeStart,
 		&i.RescheduledEventTimeStart,
 		&i.EventTimeEnd,
-		&i.PostedByUser,
 		&i.Category,
+		&i.SubmittedBy,
 		&i.HostedByClub,
 		&i.HostedByUser,
 		&i.IsPublic,
