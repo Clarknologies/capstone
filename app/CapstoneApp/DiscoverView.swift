@@ -9,13 +9,11 @@ import SwiftUI
 
 struct DiscoverView: View {
     var body: some View {
-        ScrollView(.vertical) {
-            EventSection("Today")
+        List {
+            EventSection()
             EventSection("Tomorrow")
-            EventSection("October 29")
-            EventSection("October 30")
         }
-        .safeAreaPadding(.leading)
+//        .safeAreaPadding(.horizontal)
         .navigationTitle("Discover")
         .navigationBarTitleDisplayMode(.inline)
     }
@@ -49,26 +47,32 @@ struct EventItem: View {
                 )
                 .font(.footnote.smallCaps())
             }
-            .frame(maxWidth: .infinity)
-            Image(systemName: "chevron.right")
-                .padding(.horizontal, 8)
         }
-        .frame(width: 300)
-        .frame(maxHeight: .infinity)
+
     }
 }
 
 struct EventSection: View {
     @Namespace private var namespace
-    var title: String = "Today's Events"
-    
-    init(_ title: String) {
+    var title: String
+
+    init(_ title: String = "Today's Events") {
         self.title = title
     }
-    
+
     var body: some View {
-        VStack(alignment: .leading) {
+        Section {
+            ForEach(0..<5, id: \.self) { _ in
+                NavigationLink {
+                    EventDetailView()
+                } label: {
+                    EventItem()
+                        .tint(Color.primary)
+                }
+            }
+        } header: {
             Button {
+                print(Date.now)
             } label: {
                 HStack {
                     Text(title)
@@ -82,33 +86,9 @@ struct EventSection: View {
                         .opacity(0.7)
                 }
             }
-            
-            ScrollView(.horizontal, showsIndicators: false) {
-                LazyHGrid(rows: [
-                    GridItem(.flexible(minimum: 25, maximum: 150)),
-                    GridItem(.flexible(minimum: 25, maximum: 150))
-                ], alignment: .top, spacing: 20) {
-                    ForEach(0..<5, id: \.self) { item in
-                        NavigationLink {
-                            EventDetailView()
-                                .navigationTransition(
-                                    .zoom(sourceID: "\(item)", in: namespace)
-                                )
-                        } label: {
-                            EventItem()
-                                .tint(Color.primary)
-                                .matchedTransitionSource(id: "\(item)", in: namespace)
-                        }
-                    }
-                }
-                .scrollTargetLayout()
-            }
-            .scrollTargetBehavior(.viewAligned)
         }
-        Divider()
-            .padding(.bottom)
     }
-    
+
 }
 
 
